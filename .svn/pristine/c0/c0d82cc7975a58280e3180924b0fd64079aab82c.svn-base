@@ -1,0 +1,101 @@
+﻿using System;
+using System.Web.UI;
+using System.Collections.Generic;
+
+namespace Atomo.Web
+{
+    public abstract  class MasterPage: System.Web.UI.MasterPage
+    {
+        private JsContainer jsContainer;
+        private CssContainer cssContainer;
+
+        public MasterPage()
+        {
+            this.jsContainer = new JsContainer();
+            this.cssContainer = new CssContainer();
+            Create();
+        }
+
+        #region Properties
+        public JsContainer JsContainer
+        {
+            get { return jsContainer; }
+        }
+
+        public CssContainer CssContainer
+        {
+            get { return cssContainer; }
+        }
+        #endregion
+
+        protected override void CreateChildControls()
+        {
+            base.CreateChildControls();
+            PageBuilder pageBuilder = new PageBuilder(this.Controls, cssContainer, this.GetAllJs());
+            pageBuilder.Build();
+        }
+
+        public void Create()
+        {
+            this.RegisterLinks();
+            this.SetCssID();
+            this.SetCssIsLocal();
+            this.SetJsIsTop();
+            this.SetJsIsLocal();
+
+            jsContainer.Create(this.GetJsCommon(), this.GetJsLinked(), this.GetJs());
+            cssContainer.Create(this.GetCssCommon(), this.GetCssLinked(), this.GetCss());
+        }
+
+        #region Virtual Methods
+
+
+        public virtual void RegisterLinks()
+        {}
+
+        public virtual List<string> GetCssCommon()
+        {
+            return null; 
+        }
+        public virtual List<string> GetCssLinked()
+        {
+            return null;
+        }
+        public virtual string GetCss()
+        {
+            return string.Empty;
+        }
+        public virtual void SetCssID()
+        {
+        }
+        public virtual void SetCssIsLocal()
+        {
+        }
+
+        public virtual List<string> GetJsCommon()
+        {
+            return null;
+        }
+        public virtual List<string> GetJsLinked()
+        {
+            return null;
+        }
+        public virtual string GetJs()
+        {
+            return string.Empty;
+        }
+        public virtual JsContainer GetAllJs()
+        {
+            return this.jsContainer;
+        }
+        public virtual void SetJsIsTop()
+        {
+        }
+        public virtual void SetJsIsLocal()
+        {
+        }
+
+        #endregion
+
+    }
+}

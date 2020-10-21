@@ -1,0 +1,207 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace Atomo.Web
+{
+    public class CssContainer
+    {
+        #region Declaration
+
+        private string cssContainer;
+        private string cssModule;
+        private List<CssInfo> cssPageLinked;
+        private List<CssInfo> cssModuleLinked;
+        private List<CssInfo> cssCommonLinked;
+        private List<string> cssModuleResource;
+        private Dictionary<string, CssInfo> cssLinkedInfo;
+        private List<string> cssLinkedUsed;
+        private bool cssIsLocal;
+        private string cssId;
+
+        #endregion
+
+        public CssContainer(): this(false, string.Empty)
+        {
+        }
+
+        public CssContainer(bool cssIsLocal, string cssId)
+        {
+            this.cssCommonLinked = new List<CssInfo>();
+            this.cssContainer = string.Empty;
+            this.cssPageLinked = new List<CssInfo>();
+            this.cssModule = string.Empty;
+            this.cssModuleLinked = new List<CssInfo>();
+            this.cssModuleResource = new List<string>();
+            this.cssLinkedInfo = new Dictionary<string, CssInfo>();
+            this.cssLinkedUsed = new List<string>();
+            this.cssIsLocal = cssIsLocal;
+            this.cssId = cssId;
+        }
+
+        #region Properties
+
+        public string CssId
+        {
+            set { cssId = value; }
+            get { return cssId; }
+        }
+
+        public bool CssIsLocal
+        {
+            set { cssIsLocal =value; }
+            get { return cssIsLocal; }
+        }
+
+        public Dictionary<string, CssInfo> CssLinkedInfo
+        {
+            get { return cssLinkedInfo; }
+        }
+
+        public CssInfo[] CssCommonLinked
+        {
+            get
+            {
+                return (CssInfo[])cssCommonLinked.ToArray().Clone();
+            }
+        }
+
+        public CssInfo[] CssPageLinked
+        {
+            get
+            {
+                return (CssInfo[])cssPageLinked.ToArray().Clone();
+            }
+        }
+
+        public CssInfo[] CssModuleLinked
+        {
+            get
+            {
+                return (CssInfo[]) cssModuleLinked.ToArray().Clone();
+            }
+        }
+
+        public string CssPage
+        {
+            get
+            {
+                return cssContainer;
+            }
+        }
+
+        public string CssModule
+        {
+            get
+            {
+                return cssModule;
+            }
+        }
+
+        public string[] CssModuleResource
+        {
+            get
+            {
+                return (string[]) cssModuleResource.ToArray().Clone();
+            }
+        }
+
+
+        #endregion
+
+        #region Methods
+
+        public void Create(List<string> cssKeysCommon, List<string> cssKeysPage, string cssPage)
+        {
+            this.SetCssCommon(cssKeysCommon);
+            this.SetCssPage(cssKeysPage, cssPage);
+        }
+
+        private void SetCssCommon(List<string> cssKeys)
+        {
+            foreach (CssInfo cssInfo in this.ManageCssLinked(cssKeys))
+                this.cssCommonLinked.Add(cssInfo); 
+        }
+
+        private void SetCssPage(List<string> cssKeys, string css)
+        {
+            foreach (CssInfo cssInfo in this.ManageCssLinked(cssKeys))
+                this.cssPageLinked.Add(cssInfo);
+
+            this.cssContainer += string.Concat(css, " "); 
+        }
+
+        private List<CssInfo> ManageCssLinked(List<string> keys)
+        {
+            List<CssInfo> cssLinkLista = new List<CssInfo>();
+
+
+            if (keys != null)
+            {
+                foreach (string key in keys)
+                {
+                    if (!cssLinkedInfo.ContainsKey(key))
+                        throw new Exception("There is no css key");
+
+                    if (!cssLinkedUsed.Contains(key))
+                    {
+                        cssLinkedUsed.Add(key);
+                        cssLinkLista.Add(cssLinkedInfo[key]);
+                    }
+                }
+            }
+
+            return cssLinkLista;
+        }
+
+        public void AddToCssLinked(List<string> keys)
+        {
+            foreach (CssInfo cssInfo in this.ManageCssLinked(keys))
+                this.cssModuleLinked.Add(cssInfo);
+        }
+
+        public void AddToCss(string css)
+        {
+            if (css.Trim()!=string.Empty) 
+                this.cssModule += string.Concat(css, " ");
+        }
+
+        public void AddToCssResource(List<string> references)
+        {
+            if (references != null)
+            {
+                foreach (string reference in references)
+                    if (!cssModuleResource.Contains(reference))
+                        cssModuleResource.Add(reference);
+            }
+
+        }
+
+        public void ValidateLink(string link)
+        {
+            cssCommonLinked.RemoveAll(
+                delegate(CssInfo cssInfo)
+                {
+                    return (link.Contains(cssInfo.AkaPath) || link.Contains(cssInfo.LocPath));
+                }
+            );
+
+
+            cssModuleLinked.RemoveAll(
+                delegate(CssInfo cssInfo)
+                {
+                    return (link.Contains(cssInfo.AkaPath) || link.Contains(cssInfo.LocPath));
+                }
+            );
+
+            cssPageLinked.RemoveAll(
+                delegate(CssInfo cssInfo)
+                {
+                    return (link.Contains(cssInfo.AkaPath) || link.Contains(cssInfo.LocPath));
+                }
+            );
+
+        }
+
+        #endregion
+    }
+}

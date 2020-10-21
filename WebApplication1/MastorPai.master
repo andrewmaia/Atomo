@@ -1,0 +1,8 @@
+﻿<%@ Master Language="C#" MasterPageFile="~/MasterAvo.Master" AutoEventWireup="true" CodeBehind="MastorPai.master.cs" Inherits="WebApplication1.MastorPai" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+        Master PAI
+        <asp:ContentPlaceHolder ID="cphUsuarioGerenciar_corpo" runat="server">
+        </asp:ContentPlaceHolder>
+</asp:Content>
